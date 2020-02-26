@@ -130,7 +130,7 @@ var testInvoiceSummary = &do.InvoiceSummary{
 func TestInvoicesCommand(t *testing.T) {
 	invoicesCmd := Invoices()
 	assert.NotNil(t, invoicesCmd)
-	assertCommandNames(t, invoicesCmd, "get", "list", "summary")
+	assertCommandNames(t, invoicesCmd, "get", "list", "summary", "csv", "pdf")
 }
 
 func TestInvoicesGet(t *testing.T) {
@@ -160,6 +160,29 @@ func TestInvoicesSummary(t *testing.T) {
 		config.Args = append(config.Args, "example-invoice-uuid")
 
 		err := RunInvoicesSummary(config)
+		assert.NoError(t, err)
+	})
+}
+
+func TestInvoicesGetPDF(t *testing.T) {
+	withTestClient(t, func(config *CmdConfig, tm *tcMocks) {
+		tm.invoices.EXPECT().GetPDF("example-invoice-uuid").Return([]byte("pdf response"), nil)
+
+		config.Args = append(config.Args, "example-invoice-uuid")
+
+		err := RunInvoicesGetPDF(config)
+		assert.NoError(t, err)
+	})
+}
+
+
+func TestInvoicesGetCSV(t *testing.T) {
+	withTestClient(t, func(config *CmdConfig, tm *tcMocks) {
+		tm.invoices.EXPECT().GetCSV("example-invoice-uuid").Return([]byte("csv response"), nil)
+
+		config.Args = append(config.Args, "example-invoice-uuid")
+
+		err := RunInvoicesGetCSV(config)
 		assert.NoError(t, err)
 	})
 }
